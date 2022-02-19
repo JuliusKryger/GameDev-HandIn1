@@ -22,9 +22,14 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Update() {
-
-        //  The Movement (awsd keys).
-        moveDirection = new Vector3(Input.GetAxis("Horizontal") * moveSpeed, moveDirection.y, Input.GetAxis("Vertical") * moveSpeed);
+        //  We wanna store our Y-Direction in a float so that when we normalize moveDirection it won't makes us slow fall.
+        float yStore = moveDirection.y;
+        //  Makes us move the direction camera is facing when going forward.
+        moveDirection = (transform.forward * Input.GetAxis("Vertical")) + (transform.right * Input.GetAxis("Horizontal"));
+        //  Normalizing the speed, as we either moves really slow or really fast whithout it.
+        moveDirection = moveDirection.normalized * moveSpeed;
+        //  Then setting our moveDirection.y as it were before we normalized.
+        moveDirection.y = yStore;
 
         //  Checks if we're grounded and if the (spacebar) is pressed we Jump, this prevents double jumping.
         //  also defaults our y direction to zero as soon as we're grounded.
@@ -42,6 +47,10 @@ public class PlayerController : MonoBehaviour {
         controller.Move(moveDirection * Time.deltaTime);
     }
 }
+
+
+    //  The Movement (awsd keys).
+    //moveDirection = new Vector3(Input.GetAxis("Horizontal") * moveSpeed, moveDirection.y, Input.GetAxis("Vertical") * moveSpeed);
 
 
 // This is now redundent code that i used for the player when using the rigidbody movement system. (Belonged in update function)
