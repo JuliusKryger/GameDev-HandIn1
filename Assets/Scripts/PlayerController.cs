@@ -6,12 +6,19 @@ public class PlayerController : MonoBehaviour {
 
     //public Rigidbody theRB;
     public CharacterController controller;
-
+    public Animator anim;
     private Vector3 moveDirection;
+    public Transform pivot;
+    public GameObject playerModel;
+
+    public float rotateSpeed;
     public float moveSpeed;
     public float jumpForce;
-
     public float gravityScale;
+
+    public float KnockBackForce;
+    public float KnockBackTime;
+    private float KnockBackCounter;
 
     //Physics.gravity = new Vector3(0, -9.8F, 0);
     
@@ -22,6 +29,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Update() {
+        if(KnockBackCounter <= 0) {
         //  We wanna store our Y-Direction in a float so that when we normalize moveDirection it won't makes us slow fall.
         float yStore = moveDirection.y;
         //  Makes us move the direction camera is facing when going forward.
@@ -39,12 +47,33 @@ public class PlayerController : MonoBehaviour {
                 moveDirection.y = jumpForce;   
             }
         }
+        } else {
+            KnockBackCounter -= Time.deltaTime;
+        }
 
         //  Adding Physics to our player. (Making him gravitate towards the ground).
         moveDirection.y = moveDirection.y + (Physics.gravity.y * gravityScale * Time.deltaTime);
 
         //  OBS. We are using "Time.deltatime" to eliminate the difference of a users speed based on their framerate. Beacuse "Time.deltatime" is (The interval in seconds from the last frame to the current one).
         controller.Move(moveDirection * Time.deltaTime);
+
+        //  Move the player in different directions based on a camera look direction.
+        if (Input.GetAxis("Horizontal") !=0 || Input.GetAxis("Vertical") !=0) {
+            transform.rotation = Quaternion.Euler(0f, pivot.rotation.eulerAngles.y, 0f);
+
+            //  Smoothes things out a bit.
+            Quaternion newRotation = Quaternion.LookRotation(new Vector3(moveDirection.x, 0f, moveDirection.z));
+            playerModel.transform.rotation = Quaternion.Slerp(playerModel.transform.rotation, newRotation, rotateSpeed * Time.deltaTime);
+        }
+
+        anim.SetBool("isGrounded", controller.isGrounded);
+        anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
+    }
+
+    public void Knockback(Vector3 direction) {
+        KnockBackCounter = KnockBackTime;
+        moveDirection = direction * KnockBackForce;
+        moveDirection.y = KnockBackForce;
     }
 }
 

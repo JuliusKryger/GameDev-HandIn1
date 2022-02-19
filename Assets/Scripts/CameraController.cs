@@ -22,7 +22,8 @@ public class CameraController : MonoBehaviour {
         }
         //  Pivot camera stuff.
         pivot.transform.position = target.transform.position;
-        pivot.transform.parent = target.transform;
+        //pivot.transform.parent = target.transform;
+        pivot.transform.parent = null;
 
         //  Hiding cursor during gameplay.
         Cursor.lockState = CursorLockMode.Locked;
@@ -30,9 +31,12 @@ public class CameraController : MonoBehaviour {
 
     //  Using LateUpdate here as we only wanna move the camera after we have moved the player.
     void LateUpdate() {
+
+        pivot.transform.position = target.transform.position;
+
         //  Gets the x posistion of the mouse & rotates the camera acordingly (Moves the camera from side to side).
         float horizontal = Input.GetAxis("Mouse X") * rotateSpeed;
-        target.Rotate(0, horizontal, 0);
+        pivot.Rotate(0, horizontal, 0);
 
         //  Get Y position of the mouse and rotates the pivot.
         float vertical = Input.GetAxis("Mouse Y") * rotateSpeed;
@@ -54,7 +58,7 @@ public class CameraController : MonoBehaviour {
         }
 
         //  Move the camera based on the current rotation of the target/pivot and the original offset.
-        float desiredYAngle = target.eulerAngles.y;
+        float desiredYAngle = pivot.eulerAngles.y;
         float desiredXAngle = pivot.eulerAngles.x;
         Quaternion rotation = Quaternion.Euler(desiredXAngle, desiredYAngle, 0);
         transform.position = target.position - (rotation * offset);
