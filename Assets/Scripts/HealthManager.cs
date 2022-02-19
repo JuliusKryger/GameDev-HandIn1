@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HealthManager : MonoBehaviour
 {
@@ -9,12 +10,14 @@ public class HealthManager : MonoBehaviour
     public int currentHealth;
 
     public PlayerController thePlayer;
+    public HealthBar healthBar;
 
 
     // Start is called before the first frame update
     void Start()
     {
         currentHealth = maxHealth;
+        healthBar.SetMaxHealth(maxHealth);
 
         thePlayer = FindObjectOfType<PlayerController>();
     }
@@ -28,6 +31,7 @@ public class HealthManager : MonoBehaviour
     public void HurtPlayer (int damage, Vector3 direction) {
         currentHealth -= damage;
         thePlayer.Knockback(direction);
+        healthBar.SetHealth(currentHealth);
     }
 
     public void HealPlayer (int healAmount) {
